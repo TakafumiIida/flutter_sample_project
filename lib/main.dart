@@ -9,15 +9,12 @@ import 'camera_page.dart';
 
 void main() {
   if(Platform.isAndroid) {
-    //FlutterEngine利用時に呼び出す。画面の向きやロケール 現状は一旦不要なのでコメントアウト
     WidgetsFlutterBinding.ensureInitialized();
     // コンソールに下記が出るがbluetooth使えてる？
     // No permissions found in manifest
     // Bluetooth permission missing in manifest メッセージが出るけど使えてる？Android10だと表示されない。
     [
       Permission.location,
-      Permission.locationAlways,
-      Permission.locationWhenInUse,
       Permission.storage,
       Permission.bluetooth,
       Permission.bluetoothConnect,

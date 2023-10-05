@@ -9,38 +9,61 @@ class BluetoothPage extends StatelessWidget{
 
   void onPressed() async {
     debugPrint("onPressed start");
+    FlutterBlue flutterBlue = FlutterBlue.instance;
+    flutterBlue.startScan(timeout: Duration(seconds: 5));
 
-    // bool ava = await FlutterBlue.instance.isAvailable;
-    // bool on = await FlutterBlue.instance.isOn;
-    // print(ava);
-    // print(on);
+    flutterBlue.scanResults.listen((result) async{
+      for(ScanResult r in result){
+        if(r.advertisementData.connectable) {
+          r.device.state.listen((state) async{
+            if(state == BluetoothDeviceState.disconnected){
+              //接続
+              await r.device.connect().then((value) {
+                print("■connect");
+                print("localName:${r.advertisementData.localName}");
+                print("serviceData:${r.advertisementData.serviceData}");
+                print("manufacturerData:${r.advertisementData.manufacturerData}");
+                print("serviceUuids:${r.advertisementData.serviceUuids}");
+              });
+            }
 
-    //FlutterBlue flutterBlue = FlutterBlue.instance;
-    //flutterBlue.startScan(timeout: Duration(seconds: 5));
+            if(state == BluetoothDeviceState.connected){
+              print("★coneected");
+              print("localName:${r.advertisementData.localName}");
+              print("serviceData:${r.advertisementData.serviceData}");
+              print("manufacturerData:${r.advertisementData.manufacturerData}");
+              print("serviceUuids:${r.advertisementData.serviceUuids}");
+            }
+          });
+        }
+      }
+    });
 
-    // BT接続中だが取得が出来ない
+    // BT接続中だが取得が出来ない。Scanしないと接続できない。
     List<BluetoothDevice> connectedSystemDevises = await FlutterBlue.instance.connectedDevices;
-    //List<BluetoothDevice> connectedSystemDevises = await FlutterBluePlus.connectedSystemDevices;
+    // //List<BluetoothDevice> connectedSystemDevises = await FlutterBluePlus.connectedSystemDevices;
     for (var d in connectedSystemDevises) {
-      debugPrint("1");
-      await d.connect();
-      List<BluetoothService> services = await d.discoverServices();
-      services.forEach((s) {
-        print(s);
-      });
-      debugPrint("2");
-    }
-
-
-    //FlutterBlue.instance.startScan(timeout: Duration(seconds: 3));
-    //List<BluetoothDevice> connectedDevices = await FlutterBlue.instance.connectedDevices;
-
-    // var timeout = 5;
-    // fb.scan(timeout: Duration(seconds: timeout),)
-    //     .listen((scanResult) {
-    //       debugPrint(scanResult.toString());
-    //     });
-
+       List<BluetoothService> services = await d.discoverServices();
+       services.forEach((s) {
+         print("deviceId:${s.deviceId}");
+         print("uuid:${s.uuid}");
+         print("isPrimary:${s.isPrimary}");
+         print("■characteristics start■");
+         print("authenticatedSignedWrites:${s.characteristics.first.properties.authenticatedSignedWrites}");
+         print("broadcast:${s.characteristics.first.properties.broadcast}");
+         print("extendedProperties:${s.characteristics.first.properties.extendedProperties}");
+         print("indicate:${s.characteristics.first.properties.indicate}");
+         print("indicateEncryptionRequired:${s.characteristics.first.properties.indicateEncryptionRequired}");
+         print("notify:${s.characteristics.first.properties.notify}");
+         print("notifyEncryptionRequired:${s.characteristics.first.properties.notifyEncryptionRequired}");
+         print("read:${s.characteristics.first.properties.read}");
+         print("write:${s.characteristics.first.properties.write}");
+         print("writeWithoutResponse:${s.characteristics.first.properties.writeWithoutResponse}");
+         print("■characteristics end■");
+       });
+    //   debugPrint("2");
+      d.disconnect();
+     }
     debugPrint("onPressed end");
   }
 

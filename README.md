@@ -19,3 +19,8 @@ samples, guidance on mobile development, and a full API reference.
 ### Oct 3, 2023
 - add tab
 - add List Page
+### Oct 4, 2023
+- add Bluetooth Page
+### Oct 5, 2023
+- add Camera Page
+- Connected bluetooth service, still checking
