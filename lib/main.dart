@@ -1,13 +1,45 @@
+import 'dart:io'; //Platform.isAndroidの利用のため
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:camera/camera.dart';
 
 import 'list_page.dart'; //別ファイルになる場合はimport必要
+import 'bluetooth_page.dart';
+import 'camera_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  if(Platform.isAndroid) {
+    //FlutterEngine利用時に呼び出す。画面の向きやロケール 現状は一旦不要なのでコメントアウト
+    WidgetsFlutterBinding.ensureInitialized();
+    // コンソールに下記が出るがbluetooth使えてる？
+    // No permissions found in manifest
+    // Bluetooth permission missing in manifest メッセージが出るけど使えてる？Android10だと表示されない。
+    [
+      Permission.location,
+      Permission.locationAlways,
+      Permission.locationWhenInUse,
+      Permission.storage,
+      Permission.bluetooth,
+      Permission.bluetoothConnect,
+      Permission.bluetoothScan,
+      // Permission.bluetoothAdvertise,
+      Permission.camera,
+      Permission.microphone,
+    ].request().then((status) async {
+      final cameras = await availableCameras();
+      final firstCamera = cameras.first;
+
+      runApp(MyApp(camera: firstCamera));
+    });
+  }
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({
+    Key? key,
+    required this.camera,
+    }) : super(key: key);
+  final CameraDescription camera;
 
   // This widget is the root of your application.
   @override
@@ -19,18 +51,20 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: DefaultTabController(
-        length:2,
+        length:4,
         child: Scaffold(
           appBar: AppBar(
             title: Text("Flutter Demo Page"),
             bottom: const TabBar(
               tabs: [
                 Tab(text: "Home Page"),
-                Tab(text: "ListPage"),
+                Tab(text: "List Page"),
+                Tab(text: "Bluetooth Page"),
+                Tab(text: "Camera page"),
               ]
             )
           ),
-          body: const TabBarView(
+          body: TabBarView(
             children: [
               Tab(
                 child: MyHomePage(title: "Flutter Demo Home Page"),
@@ -38,6 +72,12 @@ class MyApp extends StatelessWidget {
               Tab(
                 child: ListPage(),
               ),
+              Tab(
+                child: BluetoothPage(),
+              ),
+              Tab(
+                child: CameraPage(camera: camera),
+              )
             ],
           )
         ),
@@ -65,6 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // buildはUI処理を記載
   @override
   Widget build(BuildContext context) {
     return Scaffold(
