@@ -27,7 +27,7 @@ class ListPage extends StatelessWidget{
            //   onTap: onTap,
            // )
          )
-      )
+      ),
     );
   }
 }

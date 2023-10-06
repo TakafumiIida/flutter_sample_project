@@ -24,3 +24,5 @@ samples, guidance on mobile development, and a full API reference.
 ### Oct 5, 2023
 - add Camera Page
 - Connected bluetooth service, still checking
+### Oct 6, 2023
+- fix change bluetooth plugin
