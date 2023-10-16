@@ -26,3 +26,5 @@ samples, guidance on mobile development, and a full API reference.
 - Connected bluetooth service, still checking
 ### Oct 6, 2023
 - fix change bluetooth plugin
+### Oct 10-13, 2023
+- fix Bluetooth microphone available

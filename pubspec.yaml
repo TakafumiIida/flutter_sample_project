@@ -41,6 +41,10 @@ dependencies:
   path: ^1.8.3
   flutter_blue: ^0.8.0
   flutter_bluetooth_serial: ^0.4.0
+  flutter_audio_capture: ^1.1.6
+  audio_session: ^0.1.16
+  speech_to_text: ^6.3.0
+  audio_streamer: ^4.0.0
 
 dev_dependencies:
   flutter_test:

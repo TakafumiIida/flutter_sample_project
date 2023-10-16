@@ -1,14 +1,49 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 //import 'package:flutter_blue/flutter_blue.dart';
 
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:flutter_audio_capture/flutter_audio_capture.dart';
+import 'package:audio_session/audio_session.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:speech_to_text/speech_recognition_error.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:audio_streamer/audio_streamer.dart';
 
 class BluetoothPage extends StatelessWidget{
   BluetoothPage({super.key});
+  FlutterAudioCapture audioPlugin = new FlutterAudioCapture();
+  stt.SpeechToText speech = stt.SpeechToText();
+  final streamer = AudioStreamer();
+  int? sampleRate;
+  bool isRecording = false;
+  List<double> audio = [];
+  List<double>? latestBuffer;
+  double? recordingTime;
+  StreamSubscription<List<double>>? audioSubscription;
 
   void input(Uint8List data){
     print("★★★★★★input★★★★★★★★★★");
+    print(data);
+  }
+
+  void stop(){
+    print("stop");
+    speech.stop();
+  }
+
+  void resultListener(SpeechRecognitionResult result) {
+    print("resultListener");
+  }
+
+  void errorListener(SpeechRecognitionError error) {
+    print("errorListener");
+  }
+
+  void statusListener(String status) {
+    print("status:$status");
   }
 
   void onPressed() async {
@@ -29,16 +64,17 @@ class BluetoothPage extends StatelessWidget{
           print("address:${device.address}");
           print("type:${device.type}");
 
-          BluetoothConnection.toAddress(device.address).then((connection){
+          BluetoothConnection.toAddress(device.address).then((connection) async{
             print("■connect start");
             print("isConnected:${connection.isConnected}");
             connection.input!.listen(input).onDone(() {
               print("■connection Close");
             });
-            //outputは不要
-            // List<int> list = 'xxx'.codeUnits;
-            // Uint8List data = Uint8List.fromList(list);
-            // connection!.output.add(data);
+
+            //Bluetoothマイク動作には下記２行が必須
+            var session = await AudioSession.instance;
+            await session.configure(AudioSessionConfiguration.speech());
+
             print("■connection end");
           }).catchError((error) {
             print("〇error");
@@ -49,72 +85,60 @@ class BluetoothPage extends StatelessWidget{
     } catch (PlatformException) {
       print("error");
     }
-/*
-    FlutterBlue flutterBlue = FlutterBlue.instance;
-    flutterBlue.startScan(timeout: Duration(seconds: 5));
 
-    flutterBlue.scanResults.listen((result) async{
-      for(ScanResult r in result){
-        if(r.advertisementData.connectable) {
-          r.device.state.listen((state) async{
-            if(state == BluetoothDeviceState.disconnected){
-              //接続
-              try {
-                await r.device.connect().then((value) {
-                  print("■connect");
-                  //print("localName:${r.advertisementData.localName}");
-                  // print("serviceData:${r.advertisementData.serviceData}");
-                  // print("manufacturerData:${r.advertisementData.manufacturerData}");
-                  print("serviceUuids:${r.advertisementData.serviceUuids}");
-                });
-              } catch (PlatformException){
-                //already connect exceptionになることがある。タイミングの問題？
-                print("●connect Exception");
-              }
-            }
-
-            if(state == BluetoothDeviceState.connected){
-              print("■coneected");
-              // print("localName:${r.advertisementData.localName}");
-              // print("serviceData:${r.advertisementData.serviceData}");
-              // print("manufacturerData:${r.advertisementData.manufacturerData}");
-              // print("serviceUuids:${r.advertisementData.serviceUuids}");
-            }
-          });
-        }
-      }
-    });
-
-    // BT接続中だが取得が出来ない。Scanしないと接続できない。
-    List<BluetoothDevice> connectedSystemDevises = await FlutterBlue.instance.connectedDevices;
-    // //List<BluetoothDevice> connectedSystemDevises = await FlutterBluePlus.connectedSystemDevices;
-    for (var d in connectedSystemDevises) {
-      print("★connectedSystemDevise★");
-       List<BluetoothService> services = await d.discoverServices();
-       services.forEach((s) {
-         print("★service★");
-         print("deviceId:${s.deviceId}");
-         print("uuid:${s.uuid}");
-         print("isPrimary:${s.isPrimary}");
-         print("■characteristics start■");
-         print("authenticatedSignedWrites:${s.characteristics.first.properties.authenticatedSignedWrites}");
-         print("broadcast:${s.characteristics.first.properties.broadcast}");
-         print("extendedProperties:${s.characteristics.first.properties.extendedProperties}");
-         print("indicate:${s.characteristics.first.properties.indicate}");
-         print("indicateEncryptionRequired:${s.characteristics.first.properties.indicateEncryptionRequired}");
-         print("notify:${s.characteristics.first.properties.notify}");
-         print("notifyEncryptionRequired:${s.characteristics.first.properties.notifyEncryptionRequired}");
-         print("read:${s.characteristics.first.properties.read}");
-         print("write:${s.characteristics.first.properties.write}");
-         print("writeWithoutResponse:${s.characteristics.first.properties.writeWithoutResponse}");
-         print("■characteristics end■");
-       });
-    //   debugPrint("2");
-      d.disconnect();
-     }
-
- */
     debugPrint("onPressed end");
+  }
+
+  void onSpeechStart() async{
+    print("onSpeech Start");
+    await audioPlugin.start(onSpeechListen, onError, sampleRate: 16000, bufferSize: 3000);
+  }
+
+  void onSpeechListen(dynamic obj) {
+    print("listen start");
+    var buffer = Float64List.fromList(obj.cast<double>());
+    print(buffer);
+  }
+
+  void onError(Object e) {
+    print("onError:$e");
+  }
+
+  void onSpeechStop() async {
+    print("onSpeech End");
+    await audioPlugin.stop();
+    speech.stop();
+  }
+
+  //音声テキスト変換
+  void speak() async {
+    bool available = await speech.initialize(onError: onError, onStatus: statusListener);
+    if(available) {
+      print("available");
+      await speech.listen(onResult: (result) {
+        print("speech listen:${result.recognizedWords}");
+      });
+    } else {
+      print("not available");
+    }
+  }
+
+  void onAudio(List<double> buffer) async {
+    print("onAudio");
+    audio.addAll(buffer);
+    sampleRate ??= await AudioStreamer().actualSampleRate;
+    recordingTime = audio.length / sampleRate!;
+    latestBuffer = buffer;
+    print(buffer);
+  }
+
+  void onStop() async {
+    audioSubscription?.cancel();
+    isRecording = false;
+  }
+
+  void handleError(PlatformException error) {
+    print(error);
   }
 
   @override
@@ -125,10 +149,30 @@ class BluetoothPage extends StatelessWidget{
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const Text("BluetoothPage"),
+              //Bluetooth接続
               ElevatedButton(
                   onPressed: onPressed,
                   child: const Icon(Icons.add)
               ),
+              //音声テキスト変換
+              ElevatedButton(
+                  onPressed: speak,
+                  child: const Icon(Icons.mic)),
+              //音声バイナリ化Start
+              ElevatedButton(
+                  onPressed: ()async{
+                    try{
+                      AudioStreamer().sampleRate = 22100;
+                      audioSubscription = AudioStreamer().audioStream.listen(onAudio, onError: handleError);
+                    } catch(error) {
+                      print("error:$error");
+                    }
+                  },
+                child: const Icon(Icons.mic)),
+              //音声バイナリ化Stop
+              ElevatedButton(
+                  onPressed: onStop,
+                  child: const Icon(Icons.mic_off))
           ]
        )
      ),
