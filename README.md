@@ -28,3 +28,6 @@ samples, guidance on mobile development, and a full API reference.
 - fix change bluetooth plugin
 ### Oct 10-13, 2023
 - fix Bluetooth microphone available
+### Oct 16, 2023
+- fix BluetoothPage StatefulWidget
+- fix BluetoothPage Start/Stop one button

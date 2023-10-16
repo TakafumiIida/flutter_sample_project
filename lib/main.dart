@@ -7,6 +7,8 @@ import 'list_page.dart'; //別ファイルになる場合はimport必要
 import 'bluetooth_page.dart';
 import 'camera_page.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 void main() {
   if(Platform.isAndroid) {
     WidgetsFlutterBinding.ensureInitialized();
@@ -47,6 +49,14 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigoAccent),
         useMaterial3: true,
       ),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale("ja", "JP"),
+      ],
       home: DefaultTabController(
         length:4,
         child: Scaffold(

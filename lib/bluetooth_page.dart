@@ -2,48 +2,89 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-//import 'package:flutter_blue/flutter_blue.dart';
 
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
-import 'package:flutter_audio_capture/flutter_audio_capture.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:speech_to_text/speech_recognition_error.dart';
-import 'package:speech_to_text/speech_recognition_result.dart';
+//import 'package:speech_to_text/speech_recognition_error.dart';
+//import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:audio_streamer/audio_streamer.dart';
 
-class BluetoothPage extends StatelessWidget{
+class BluetoothPage extends StatefulWidget{
   BluetoothPage({super.key});
-  FlutterAudioCapture audioPlugin = new FlutterAudioCapture();
+
+  @override
+  BluetoothPageState createState() =>  BluetoothPageState();
+}
+
+class BluetoothPageState extends State<BluetoothPage> {
   stt.SpeechToText speech = stt.SpeechToText();
   final streamer = AudioStreamer();
   int? sampleRate;
   bool isRecording = false;
   List<double> audio = [];
   List<double>? latestBuffer;
-  double? recordingTime;
+  double recordingTime = 0;
   StreamSubscription<List<double>>? audioSubscription;
+  String speechToText = "";
 
-  void input(Uint8List data){
-    print("★★★★★★input★★★★★★★★★★");
-    print(data);
-  }
-
-  void stop(){
-    print("stop");
-    speech.stop();
-  }
-
-  void resultListener(SpeechRecognitionResult result) {
-    print("resultListener");
-  }
-
-  void errorListener(SpeechRecognitionError error) {
-    print("errorListener");
-  }
-
-  void statusListener(String status) {
-    print("status:$status");
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Text("BluetoothPage"),
+                //Bluetooth接続
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:[
+                      Text("接続"),
+                      ElevatedButton(
+                        onPressed: onPressed,
+                        child: const Icon(Icons.add)
+                      )
+                    ]
+                ),
+                //音声テキスト変換
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children:[
+                    Text("音声テキスト化"),
+                    ElevatedButton(
+                    onPressed: speak,
+                    child: const Icon(Icons.mic)),
+                  ]
+                ),
+                //音声バイナリ化ボタン
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("音声バイナリ化"),
+                    ElevatedButton(
+                      onPressed: isRecording ? onStop : onStart,
+                      child: isRecording ? const Icon(Icons.mic_off) : const Icon(Icons.mic)),
+                    ]
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children:[
+                    Text("音声テキスト化："),
+                    Text(speechToText)
+                  ]
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children:[
+                    Text("録音時間：$recordingTime"),
+                    Text("秒"),
+                  ]
+                )
+              ]
+          )
+      ),
+    );
   }
 
   void onPressed() async {
@@ -89,93 +130,72 @@ class BluetoothPage extends StatelessWidget{
     debugPrint("onPressed end");
   }
 
-  void onSpeechStart() async{
-    print("onSpeech Start");
-    await audioPlugin.start(onSpeechListen, onError, sampleRate: 16000, bufferSize: 3000);
-  }
-
-  void onSpeechListen(dynamic obj) {
-    print("listen start");
-    var buffer = Float64List.fromList(obj.cast<double>());
-    print(buffer);
-  }
-
-  void onError(Object e) {
-    print("onError:$e");
-  }
-
-  void onSpeechStop() async {
-    print("onSpeech End");
-    await audioPlugin.stop();
-    speech.stop();
+  // ボタンイベント取得
+  void input(Uint8List data){
+    print("★★★★★★input★★★★★★★★★★");
+    print(data);
   }
 
   //音声テキスト変換
   void speak() async {
-    bool available = await speech.initialize(onError: onError, onStatus: statusListener);
+    bool available = await speech.initialize(
+        onStatus: (status) {
+          print("status:$status");
+        },
+        onError: (error) {
+          print("onError:$error");
+        });
+
+    speechToText = "";
+
     if(available) {
       print("available");
       await speech.listen(onResult: (result) {
         print("speech listen:${result.recognizedWords}");
+        setState(() {
+          if(result.recognizedWords.length > 0) {
+            speechToText += result.recognizedWords;
+          }
+        });
       });
     } else {
       print("not available");
     }
   }
 
-  void onAudio(List<double> buffer) async {
+  //音声バイナリ化
+  void onAudio(List<double> buffer) async{
     print("onAudio");
     audio.addAll(buffer);
     sampleRate ??= await AudioStreamer().actualSampleRate;
     recordingTime = audio.length / sampleRate!;
-    latestBuffer = buffer;
-    print(buffer);
+
+    setState(() {
+      latestBuffer = buffer;
+      print("recordingTime:$recordingTime");
+      print("audio.length:${audio.length}");
+    });
+  }
+
+  void onStart() {
+    try{
+      AudioStreamer().sampleRate = 22100;
+      audioSubscription = AudioStreamer().audioStream.listen(onAudio, onError: handleError);
+    } catch(error) {
+      print("error:$error");
+    }
+    setState(() => isRecording = true);
   }
 
   void onStop() async {
+    print("onStop");
     audioSubscription?.cancel();
-    isRecording = false;
+
+    setState(()=> isRecording = false);
   }
 
-  void handleError(PlatformException error) {
-    print(error);
+  void handleError(Object obj) {
+    print("error:$obj");
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text("BluetoothPage"),
-              //Bluetooth接続
-              ElevatedButton(
-                  onPressed: onPressed,
-                  child: const Icon(Icons.add)
-              ),
-              //音声テキスト変換
-              ElevatedButton(
-                  onPressed: speak,
-                  child: const Icon(Icons.mic)),
-              //音声バイナリ化Start
-              ElevatedButton(
-                  onPressed: ()async{
-                    try{
-                      AudioStreamer().sampleRate = 22100;
-                      audioSubscription = AudioStreamer().audioStream.listen(onAudio, onError: handleError);
-                    } catch(error) {
-                      print("error:$error");
-                    }
-                  },
-                child: const Icon(Icons.mic)),
-              //音声バイナリ化Stop
-              ElevatedButton(
-                  onPressed: onStop,
-                  child: const Icon(Icons.mic_off))
-          ]
-       )
-     ),
-    );
-  }
 }
