@@ -45,6 +45,9 @@ dependencies:
   audio_session: ^0.1.16
   speech_to_text: ^6.3.0
   audio_streamer: ^4.0.0
+  image_picker: ^1.0.4
+  device_info: ^2.0.3
+  device_info_plus: ^9.1.0
 
 dev_dependencies:
   flutter_test:

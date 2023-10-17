@@ -8,11 +8,12 @@ import 'bluetooth_page.dart';
 import 'camera_page.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 void main() {
   if(Platform.isAndroid) {
     WidgetsFlutterBinding.ensureInitialized();
-    // コンソールに下記が出るがbluetooth使えてる？
+    // コンソールに下記が出るがbluetooth使えてる
     // No permissions found in manifest
     // Bluetooth permission missing in manifest メッセージが出るけど使えてる？Android10だと表示されない。
     [
@@ -24,6 +25,7 @@ void main() {
       // Permission.bluetoothAdvertise,
       Permission.camera,
       Permission.microphone,
+      Permission.phone,
     ].request().then((status) async {
       final cameras = await availableCameras();
       final firstCamera = cameras.first;
@@ -105,9 +107,15 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+  String? uuid = "";
 
-  void _incrementCounter() {
+  void _incrementCounter() async {
+    AndroidDeviceInfo info = await _deviceInfo.androidInfo;
     setState(() {
+      if(info.id != null) {
+        uuid = info.id;
+      }
       _counter++;
     });
   }
@@ -139,14 +147,50 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Android ID:"),
+                Text(uuid!),
+              ]
+            )
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton:
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FloatingActionButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text("Title"),
+                      content: Text("content"),
+                      actions:<Widget>[
+                        TextButton(
+                          child: Text("Cancel"),
+                          onPressed: (){
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ]
+                    );
+                  }
+                );
+              },
+              child: const Icon(Icons.add_chart),
+            ),
+            FloatingActionButton(
+              onPressed: _incrementCounter,
+              tooltip: 'Increment',
+              child: const Icon(Icons.add),
+          ), // This trailing comma makes auto-formatting nicer for build methods.
+          ]
+        )
     );
   }
 }
