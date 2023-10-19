@@ -34,3 +34,5 @@ samples, guidance on mobile development, and a full API reference.
 ### Oct 17, 2023
 - fix CameraPage Local Gallary reference
 - fix get Android ID
+### Oct 19, 2023
+- fix Image Convert

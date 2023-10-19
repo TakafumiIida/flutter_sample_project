@@ -9,6 +9,7 @@ import 'camera_page.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:device_info/device_info.dart' as di;
 
 void main() {
   if(Platform.isAndroid) {
@@ -107,14 +108,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+  //device_info_plusではandroidIdが取得できないので、device_infoで取得
+  //androidIdではなくidがユニークならidでもOK.ユニークに見えない・・・
+  //Windowsはdevice_info_plusで確認すること
+  final di.DeviceInfoPlugin _deviceInfo = di.DeviceInfoPlugin();
   String? uuid = "";
 
   void _incrementCounter() async {
-    AndroidDeviceInfo info = await _deviceInfo.androidInfo;
+    di.AndroidDeviceInfo info = await _deviceInfo.androidInfo;
     setState(() {
       if(info.id != null) {
-        uuid = info.id;
+        uuid = info.androidId;
       }
       _counter++;
     });
