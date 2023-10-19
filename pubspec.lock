@@ -285,14 +285,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  heic_to_jpg:
+  heif_converter:
     dependency: "direct main"
     description:
-      name: heic_to_jpg
-      sha256: "48fce9176e722629e9d49513c4f9c10ca4a792408781fb24c0f7e50fd80be22f"
+      name: heif_converter
+      sha256: "63ffc2a72026942de3fcb61450da197100759936085c8279aef35b995b3c1bb3"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.0"
+    version: "1.0.0"
   http:
     dependency: transitive
     description:
@@ -453,6 +453,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  mobile_scanner:
+    dependency: "direct main"
+    description:
+      name: mobile_scanner
+      sha256: "2fbc3914fe625e196c64ea8ffc4084cd36781d2be276d4d5923b11af3b5d44ff"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.1"
   path:
     dependency: "direct main"
     description:

@@ -6,9 +6,10 @@ import 'package:camera/camera.dart';
 import 'list_page.dart'; //別ファイルになる場合はimport必要
 import 'bluetooth_page.dart';
 import 'camera_page.dart';
+import 'barcode_scan_page.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+//import 'package:device_info_plus/device_info_plus.dart';
 import 'package:device_info/device_info.dart' as di;
 
 void main() {
@@ -61,7 +62,7 @@ class MyApp extends StatelessWidget {
         Locale("ja", "JP"),
       ],
       home: DefaultTabController(
-        length:4,
+        length:5,
         child: Scaffold(
           appBar: AppBar(
             title: Text("Flutter Demo Page"),
@@ -71,6 +72,7 @@ class MyApp extends StatelessWidget {
                 Tab(text: "List Page"),
                 Tab(text: "Bluetooth Page"),
                 Tab(text: "Camera page"),
+                Tab(text: "Barcode Scan Page"),
               ]
             )
           ),
@@ -87,6 +89,9 @@ class MyApp extends StatelessWidget {
               ),
               Tab(
                 child: CameraPage(camera: camera),
+              ),
+              Tab(
+                child: BarcodeScanPage(),
               )
             ],
           )

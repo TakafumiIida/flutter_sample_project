@@ -3,7 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:heic_to_jpg/heic_to_jpg.dart';
+import 'package:heif_converter/heif_converter.dart';
 
 class CameraPage extends StatefulWidget{
   const CameraPage({
@@ -42,10 +42,10 @@ class CameraState extends State<CameraPage> {
         //画像変換 拡張子ごとに利用するメソッドを変更する必要あり
         final cmd = Command()
           ..decodePngFile(pickedFile.path)
-          ..writeToFile(directory!.path + "/" + fileName + ".jpg");
+          ..writeToFile(directory.path + "/" + fileName + ".jpg");
         await cmd.executeThread();
       } else {
-        HeicToJpg.convert(pickedFile.path, jpgPath: directory!.path + "/" + fileName + ".jpg");
+        HeifConverter.convert(pickedFile.path, output: directory.path + "/" + fileName + ".jpg", format: "jpg");
       }
     }
 
