@@ -8,9 +8,9 @@ import 'package:heif_converter/heif_converter.dart';
 class CameraPage extends StatefulWidget{
   const CameraPage({
     Key? key,
-    required this.camera,
+//    required this.camera,
   }) : super(key: key);
-  final CameraDescription camera;
+//  final CameraDescription camera;
 
   @override
   CameraState createState() => CameraState();
@@ -23,7 +23,7 @@ class CameraState extends State<CameraPage> {
   final _imagePicker = ImagePicker();
 
   //ギャラリーから画像取得
-  Future getImageFromGarally() async {
+  Future getImageFromGallery() async {
     final pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
 
     if(pickedFile != null) {
@@ -58,17 +58,15 @@ class CameraState extends State<CameraPage> {
 
   @override
   void initState() {
-    super.initState();
-
-    _controller = CameraController(
-      // カメラを指定
-      widget.camera,
-      // 解像度を定義
-      ResolutionPreset.medium,
-    );
-
-    // コントローラーを初期化
-    _initializeControllerFuture = _controller.initialize();
+    // _controller = CameraController(
+    //   // カメラを指定
+    //   widget.camera,
+    //   // 解像度を定義
+    //   ResolutionPreset.medium,
+    // );
+    //
+    // // コントローラーを初期化
+    // _initializeControllerFuture = _controller.initialize();
   }
 
   @override
@@ -83,24 +81,24 @@ class CameraState extends State<CameraPage> {
     // NEXT：プレビュー画面を表示
     // FutureBuilder で初期化を待ってからプレビューを表示（それまではインジケータを表示）
     return Scaffold(
-      body: Center(
-        child: FutureBuilder<void>(
-          future: _initializeControllerFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return CameraPreview(_controller);
-            } else {
-              return const CircularProgressIndicator();
-            }
-          },
-        ),
-      ),
+      // body: Center(
+      //   child: FutureBuilder<void>(
+      //     future: _initializeControllerFuture,
+      //     builder: (context, snapshot) {
+      //       if (snapshot.connectionState == ConnectionState.done) {
+      //         return CameraPreview(_controller);
+      //       } else {
+      //         return const CircularProgressIndicator();
+      //       }
+      //     },
+      //   ),
+      // ),
       floatingActionButton:
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             FloatingActionButton(
-                onPressed: getImageFromGarally,
+                onPressed: getImageFromGallery,
                 child: const Icon(Icons.add)
             ),
             FloatingActionButton(

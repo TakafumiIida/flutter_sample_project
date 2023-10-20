@@ -1,7 +1,7 @@
 import 'dart:io'; //Platform.isAndroidの利用のため
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:camera/camera.dart';
+//import 'package:camera/camera.dart';
 
 import 'list_page.dart'; //別ファイルになる場合はimport必要
 import 'bluetooth_page.dart';
@@ -29,20 +29,23 @@ void main() {
       Permission.microphone,
       Permission.phone,
     ].request().then((status) async {
-      final cameras = await availableCameras();
-      final firstCamera = cameras.first;
+      //final cameras = await availableCameras();
+      //final firstCamera = cameras.first;
 
-      runApp(MyApp(camera: firstCamera));
+      //runApp(MyApp(camera: firstCamera));
+      runApp(MyApp());
     });
+  } else if (Platform.isWindows) {
+    runApp(MyApp());
   }
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({
     Key? key,
-    required this.camera,
+    //required this.camera,
     }) : super(key: key);
-  final CameraDescription camera;
+  //final CameraDescription camera;
 
   // This widget is the root of your application.
   @override
@@ -88,7 +91,8 @@ class MyApp extends StatelessWidget {
                 child: BluetoothPage(),
               ),
               Tab(
-                child: CameraPage(camera: camera),
+                //child: CameraPage(camera: camera),
+                child: CameraPage(),
               ),
               Tab(
                 child: BarcodeScanPage(),

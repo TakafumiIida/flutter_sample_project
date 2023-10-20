@@ -32,8 +32,10 @@ samples, guidance on mobile development, and a full API reference.
 - fix BluetoothPage StatefulWidget
 - fix BluetoothPage Start/Stop one button
 ### Oct 17, 2023
-- fix CameraPage Local Gallary reference
+- fix CameraPage Local Gallery reference
 - fix get Android ID
 ### Oct 19, 2023
 - fix Image Convert
 - fix Code39 Barcode Scan
+### Oct 20, 2023
+- fix Windows Desktop
