@@ -10,8 +10,9 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 //import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:audio_streamer/audio_streamer.dart';
 
+@immutable
 class BluetoothPage extends StatefulWidget{
-  BluetoothPage({super.key});
+  const BluetoothPage({super.key});
 
   @override
   BluetoothPageState createState() =>  BluetoothPageState();
@@ -40,7 +41,7 @@ class BluetoothPageState extends State<BluetoothPage> {
                 Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children:[
-                      Text("接続"),
+                      const Text("接続"),
                       ElevatedButton(
                         onPressed: onPressed,
                         child: const Icon(Icons.add)
@@ -51,7 +52,7 @@ class BluetoothPageState extends State<BluetoothPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children:[
-                    Text("音声テキスト化"),
+                    const Text("音声テキスト化"),
                     ElevatedButton(
                     onPressed: speak,
                     child: const Icon(Icons.mic)),
@@ -61,7 +62,7 @@ class BluetoothPageState extends State<BluetoothPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("音声バイナリ化"),
+                    const Text("音声バイナリ化"),
                     ElevatedButton(
                       onPressed: isRecording ? onStop : onStart,
                       child: isRecording ? const Icon(Icons.mic_off) : const Icon(Icons.mic)),
@@ -70,7 +71,7 @@ class BluetoothPageState extends State<BluetoothPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children:[
-                    Text("音声テキスト化："),
+                    const Text("音声テキスト化："),
                     Text(speechToText)
                   ]
                 ),
@@ -78,7 +79,7 @@ class BluetoothPageState extends State<BluetoothPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children:[
                     Text("録音時間：$recordingTime"),
-                    Text("秒"),
+                    const Text("秒"),
                   ]
                 )
               ]
@@ -95,7 +96,7 @@ class BluetoothPageState extends State<BluetoothPage> {
     try{
       deviceList = await bluetooth.getBondedDevices();
 
-      deviceList.forEach((device) {
+      for (var device in deviceList) {
         if(device.isConnected) {
           print("■Device Info");
           print("name:${device.name}");
@@ -122,7 +123,7 @@ class BluetoothPageState extends State<BluetoothPage> {
           });
 
         }
-      });
+      }
     } catch (PlatformException) {
       print("error");
     }

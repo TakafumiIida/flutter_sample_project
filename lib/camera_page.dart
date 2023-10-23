@@ -1,25 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart';
+import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:heif_converter/heif_converter.dart';
+import 'dart:io';
 
 class CameraPage extends StatefulWidget{
   const CameraPage({
     Key? key,
-//    required this.camera,
   }) : super(key: key);
-//  final CameraDescription camera;
 
   @override
   CameraState createState() => CameraState();
 }
 
 class CameraState extends State<CameraPage> {
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
-  XFile? _image;
   final _imagePicker = ImagePicker();
 
   //ギャラリーから画像取得
@@ -27,7 +22,6 @@ class CameraState extends State<CameraPage> {
     final pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
 
     if(pickedFile != null) {
-      _image = XFile(pickedFile.path);
       print(pickedFile.path);
 
       String fileNameExtension = pickedFile.path.substring(pickedFile.path.lastIndexOf('/') + 1);
@@ -40,59 +34,32 @@ class CameraState extends State<CameraPage> {
 
       if(extension != "heic") {
         //画像変換 拡張子ごとに利用するメソッドを変更する必要あり
-        final cmd = Command()
+        final cmd = img.Command()
           ..decodePngFile(pickedFile.path)
           ..writeToFile(directory.path + "/" + fileName + ".jpg");
         await cmd.executeThread();
       } else {
         HeifConverter.convert(pickedFile.path, output: directory.path + "/" + fileName + ".jpg", format: "jpg");
+        img.Image? image = img.decodeImage(File(directory.path + "/" + fileName + ".jpg").readAsBytesSync());
+        if(image != null){
+          //90度回転して保存しなおし
+          img.Image rotateImage = img.copyRotate(image, angle: 90);
+          XFile file = XFile.fromData(rotateImage.toUint8List());
+          file.saveTo(directory.path + "/" + fileName + ".jpg");
+        }
       }
     }
 
     setState(() {
       if(pickedFile != null) {
-        _image = XFile(pickedFile.path);
+        //_image = XFile(pickedFile.path);
       }
     });
   }
 
   @override
-  void initState() {
-    // _controller = CameraController(
-    //   // カメラを指定
-    //   widget.camera,
-    //   // 解像度を定義
-    //   ResolutionPreset.medium,
-    // );
-    //
-    // // コントローラーを初期化
-    // _initializeControllerFuture = _controller.initialize();
-  }
-
-  @override
-  void dispose() {
-    // ウィジェットが破棄されたら、コントローラーを破棄
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // NEXT：プレビュー画面を表示
-    // FutureBuilder で初期化を待ってからプレビューを表示（それまではインジケータを表示）
     return Scaffold(
-      // body: Center(
-      //   child: FutureBuilder<void>(
-      //     future: _initializeControllerFuture,
-      //     builder: (context, snapshot) {
-      //       if (snapshot.connectionState == ConnectionState.done) {
-      //         return CameraPreview(_controller);
-      //       } else {
-      //         return const CircularProgressIndicator();
-      //       }
-      //     },
-      //   ),
-      // ),
       floatingActionButton:
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -103,10 +70,10 @@ class CameraState extends State<CameraPage> {
             ),
             FloatingActionButton(
             onPressed: () async {
-              // 写真を撮る
-              final image = await _controller.takePicture();
-              // path を出力
-              print(image.path);
+              final XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
+               if(image != null){
+                 print(image.path);
+               }
             },
             child: const Icon(Icons.camera_alt),
           ),

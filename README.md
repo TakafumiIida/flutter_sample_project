@@ -39,3 +39,7 @@ samples, guidance on mobile development, and a full API reference.
 - fix Code39 Barcode Scan
 ### Oct 20, 2023
 - fix Windows Desktop
+### Oct 23, 2023
+- add flutter_Hooks Library
+- del Camera Library
+- fix Heic Image rotate wrong
