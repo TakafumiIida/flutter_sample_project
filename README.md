@@ -43,3 +43,5 @@ samples, guidance on mobile development, and a full API reference.
 - add flutter_Hooks Library
 - del Camera Library
 - fix Heic Image rotate wrong
+### Oct 24, 2023
+- add Android Splash image

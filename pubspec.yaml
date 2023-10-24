@@ -50,6 +50,7 @@ dependencies:
   mobile_scanner: ^3.4.1
   heif_converter: ^1.0.0
   flutter_hooks: ^0.20.3
+  flutter_native_splash: ^2.3.4
 
 dev_dependencies:
   flutter_test:
@@ -103,3 +104,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+flutter_native_splash:
+  color: '#FFFFFF'
+  android_12:
+    image: assets/splash.png

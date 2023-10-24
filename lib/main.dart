@@ -11,9 +11,13 @@ import 'barcode_scan_page.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:device_info/device_info.dart' as di;
 
+ import 'package:flutter_native_splash/flutter_native_splash.dart';
+
 void main() {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   if(Platform.isAndroid) {
-    WidgetsFlutterBinding.ensureInitialized();
     // コンソールに下記が出るがbluetooth使えてる
     // Bluetooth permission missing in manifest メッセージが出るけど使えてる。Android10だと表示されない。
     [
@@ -31,6 +35,8 @@ void main() {
   } else if (Platform.isWindows) {
     runApp(const MyApp());
   }
+
+  FlutterNativeSplash.remove();
 }
 
 class MyApp extends StatelessWidget {
@@ -92,7 +98,6 @@ class MyApp extends StatelessWidget {
 class MyHomeHookPage extends HookWidget {
   MyHomeHookPage({super.key});
   final di.DeviceInfoPlugin _deviceInfo = di.DeviceInfoPlugin();
-  final DeviceInfoPlusWindowsPlugin _deviceWindowsInfo = DeviceInfoPlusWindowsPlugin();
   String? uuid = "";
 
   @override
@@ -158,6 +163,7 @@ class MyHomeHookPage extends HookWidget {
                     di.AndroidDeviceInfo info = await _deviceInfo.androidInfo;
                     uuid = info.androidId;
                   } else if(Platform.isWindows){
+                    final DeviceInfoPlusWindowsPlugin _deviceWindowsInfo = DeviceInfoPlusWindowsPlugin();
                     WindowsDeviceInfo info = _deviceWindowsInfo.getInfo();
                     uuid = info.deviceId;
                   }
