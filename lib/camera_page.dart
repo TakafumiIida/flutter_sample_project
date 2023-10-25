@@ -44,7 +44,7 @@ class CameraState extends State<CameraPage> {
         if(image != null){
           //90度回転して保存しなおし
           img.Image rotateImage = img.copyRotate(image, angle: 90);
-          XFile file = XFile.fromData(rotateImage.toUint8List());
+          XFile file = XFile.fromData(img.encodeJpg(rotateImage));
           file.saveTo(directory.path + "/" + fileName + ".jpg");
         }
       }

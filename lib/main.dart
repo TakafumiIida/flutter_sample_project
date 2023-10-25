@@ -98,12 +98,14 @@ class MyApp extends StatelessWidget {
 class MyHomeHookPage extends HookWidget {
   MyHomeHookPage({super.key});
   final di.DeviceInfoPlugin _deviceInfo = di.DeviceInfoPlugin();
-  String? uuid = "";
+  //String? uuid = "";
 
   @override
   Widget build(BuildContext context) {
-    final state = useState<int>(0);
-    int counter = state.value;
+    final counter = useState<int>(0);
+    final uuid = useState<String>("");
+    int counterValue = counter.value;
+
     return Scaffold(
       // appBar: AppBar(
       //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -117,14 +119,14 @@ class MyHomeHookPage extends HookWidget {
                 'You have pushed the button this many times:',
               ),
               Text(
-                '$counter',
+                '$counterValue',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Android ID:"),
-                    Text(uuid!),
+                    Text(uuid.value),
                   ]
               )
             ],
@@ -161,15 +163,15 @@ class MyHomeHookPage extends HookWidget {
                 onPressed: () async {
                   if(Platform.isAndroid) {
                     di.AndroidDeviceInfo info = await _deviceInfo.androidInfo;
-                    uuid = info.androidId;
+                    uuid.value = info.androidId;
                   } else if(Platform.isWindows){
                     final DeviceInfoPlusWindowsPlugin _deviceWindowsInfo = DeviceInfoPlusWindowsPlugin();
                     WindowsDeviceInfo info = _deviceWindowsInfo.getInfo();
-                    uuid = info.deviceId;
+                    uuid.value = info.deviceId;
                   }
-                  counter++;
+                  //counter.value++;
                   //useStateで取得した変数に入れなおすと保持される
-                  state.value = counter;
+                  counter.value = counter.value + 1;
                 },
                 tooltip: 'Increment',
                 child: const Icon(Icons.add),

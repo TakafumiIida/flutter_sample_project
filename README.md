@@ -45,3 +45,4 @@ samples, guidance on mobile development, and a full API reference.
 - fix Heic Image rotate wrong
 ### Oct 24, 2023
 - add Android Splash image
+- fix Heic Image rotate wrong
