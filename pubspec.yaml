@@ -51,6 +51,9 @@ dependencies:
   heif_converter: ^1.0.0
   flutter_hooks: ^0.20.3
   flutter_native_splash: ^2.3.4
+  flutter_riverpod: ^2.4.4
+  freezed: ^2.4.5
+  build_runner: ^2.4.6
 
 dev_dependencies:
   flutter_test:

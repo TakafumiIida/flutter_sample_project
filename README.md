@@ -46,3 +46,7 @@ samples, guidance on mobile development, and a full API reference.
 ### Oct 24, 2023
 - add Android Splash image
 - fix Heic Image rotate wrong
+### Oct 25, 2023
+- fix file/flolder configuration
+### Oct 26. 2023
+- fix ListPage MVVM Pattern and Global State

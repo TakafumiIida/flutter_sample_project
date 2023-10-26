@@ -1,0 +1,3 @@
+class ItemModel {
+  String name = "";
+}

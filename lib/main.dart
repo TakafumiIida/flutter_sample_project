@@ -1,12 +1,13 @@
 import 'dart:io'; //Platform.isAndroidの利用のため
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import 'list_page.dart'; //別ファイルになる場合はimport必要
-import 'bluetooth_page.dart';
-import 'camera_page.dart';
-import 'barcode_scan_page.dart';
+import 'view/list_page.dart'; //別ファイルになる場合はimport必要
+import 'view/bluetooth_page.dart';
+import 'view/camera_page.dart';
+import 'view/barcode_scan_page.dart';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:device_info/device_info.dart' as di;
@@ -30,7 +31,8 @@ void main() {
       Permission.microphone,
       Permission.phone,
     ].request().then((status) async {
-      runApp(const MyApp());
+      //runApp(const MyApp());
+      runApp(const ProviderScope(child: MyApp()));
     });
   } else if (Platform.isWindows) {
     runApp(const MyApp());
@@ -76,7 +78,7 @@ class MyApp extends StatelessWidget {
               const Tab(
                 child: ListPage(),
               ),
-              Tab(
+              const Tab(
                 child: BluetoothPage(),
               ),
               const Tab(
@@ -165,8 +167,8 @@ class MyHomeHookPage extends HookWidget {
                     di.AndroidDeviceInfo info = await _deviceInfo.androidInfo;
                     uuid.value = info.androidId;
                   } else if(Platform.isWindows){
-                    final DeviceInfoPlusWindowsPlugin _deviceWindowsInfo = DeviceInfoPlusWindowsPlugin();
-                    WindowsDeviceInfo info = _deviceWindowsInfo.getInfo();
+                    final DeviceInfoPlusWindowsPlugin deviceWindowsInfo = DeviceInfoPlusWindowsPlugin();
+                    WindowsDeviceInfo info = deviceWindowsInfo.getInfo();
                     uuid.value = info.deviceId;
                   }
                   //counter.value++;
