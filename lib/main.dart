@@ -1,6 +1,7 @@
 import 'dart:io'; //Platform.isAndroidの利用のため
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_sample_project/view/webview_android_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -8,13 +9,15 @@ import 'view/list_page.dart'; //別ファイルになる場合はimport必要
 import 'view/bluetooth_page.dart';
 import 'view/camera_page.dart';
 import 'view/barcode_scan_page.dart';
+import 'view/webview_page.dart';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:device_info/device_info.dart' as di;
 
- import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:window_manager/window_manager.dart';
 
-void main() {
+void main() async{
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
@@ -35,6 +38,7 @@ void main() {
       runApp(const ProviderScope(child: MyApp()));
     });
   } else if (Platform.isWindows) {
+    await windowManager.ensureInitialized();
     runApp(const MyApp());
   }
 
@@ -55,7 +59,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: DefaultTabController(
-        length:5,
+        length:6,
         child: Scaffold(
           appBar: AppBar(
             title: const Text("Flutter Demo Page"),
@@ -64,8 +68,9 @@ class MyApp extends StatelessWidget {
                 Tab(text: "Home Page"),
                 Tab(text: "List Page"),
                 Tab(text: "Bluetooth Page"),
-                Tab(text: "Camera page"),
+                Tab(text: "Camera Page"),
                 Tab(text: "Barcode Scan Page"),
+                Tab(text: "WebView Page"),
               ]
             )
           ),
@@ -86,6 +91,9 @@ class MyApp extends StatelessWidget {
               ),
               const Tab(
                 child: BarcodeScanPage(),
+              ),
+              Tab(
+                child: Platform.isWindows ? WebViewPage() : WebViewAndroidPage(),
               )
             ],
           )

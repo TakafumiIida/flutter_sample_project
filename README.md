@@ -50,3 +50,5 @@ samples, guidance on mobile development, and a full API reference.
 - fix file/flolder configuration
 ### Oct 26. 2023
 - fix ListPage MVVM Pattern and Global State
+### Nov 10, 2023
+- add WebView Library

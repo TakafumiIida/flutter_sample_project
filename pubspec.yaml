@@ -54,6 +54,9 @@ dependencies:
   flutter_riverpod: ^2.4.4
   freezed: ^2.4.5
   build_runner: ^2.4.6
+  webview_windows: ^0.3.0
+  window_manager: ^0.3.7
+  webview_flutter: ^4.4.2
 
 dev_dependencies:
   flutter_test:
